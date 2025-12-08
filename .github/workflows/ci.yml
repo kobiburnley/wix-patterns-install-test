@@ -3,6 +3,13 @@ name: CI
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Runs twice a day at 04:00 UTC and 16:00 UTC
+    - cron: '0 4 * * *'
+    - cron: '0 16 * * *'
+  workflow_dispatch: {}
 
 jobs:
   test:
@@ -23,4 +30,3 @@ jobs:
 
       - name: Run tests
         run: yarn test
-
