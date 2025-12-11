@@ -1,9 +1,9 @@
-const wixPatterns = require('@wix/patterns');
-const { WixPatternsProvider } = require('@wix/patterns/provider');
+import * as wixPatterns from '@wix/patterns';
+import * as wixPatternsProvider  from '@wix/patterns/provider';
 
 describe('require-entry', () => {
   it('requires entry', () => {
     expect(wixPatterns.Table).toBeTruthy();
-    expect(WixPatternsProvider).toBeTruthy();
+    expect(wixPatternsProvider.WixPatternsProvider).toBeTruthy();
   });
 });
