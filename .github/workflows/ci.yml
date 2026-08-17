@@ -30,3 +30,38 @@ jobs:
 
       - name: Run tests
         run: yarn test
+
+      - name: Resolve installed @wix/patterns version
+        id: patterns
+        if: always()
+        run: |
+          version="$(node -p "require('./node_modules/@wix/patterns/package.json').version" 2>/dev/null || echo unknown)"
+          echo "Installed @wix/patterns@$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      # Posts to #cairo-ci (C033PFGFGAK). An incoming webhook carries its own
+      # channel, so the target lives in the SLACK_WEBHOOK_URL secret rather
+      # than here.
+      - name: Notify Slack
+        if: always()
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          PATTERNS_VERSION: ${{ steps.patterns.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "::warning::SLACK_WEBHOOK_URL is not set - skipping the Slack notification"
+            exit 0
+          fi
+
+          case "$JOB_STATUS" in
+            success) icon='✅' ;;
+            *)       icon='❌' ;;
+          esac
+
+          text="$icon CI $JOB_STATUS on \`$GITHUB_REF_NAME\` - installed \`@wix/patterns@$PATTERNS_VERSION\` (<$RUN_URL|run>, trigger: $GITHUB_EVENT_NAME)"
+
+          jq -n --arg text "$text" '{text: $text}' \
+            | curl -sS --fail-with-body -X POST -H 'Content-type: application/json' --data @- "$SLACK_WEBHOOK_URL"
