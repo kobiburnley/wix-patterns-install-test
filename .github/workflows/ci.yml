@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    # TODO: drop feat/slack-notification before merging - it is here only to
+    # exercise the Slack step on pushes to that branch.
+    branches: [main, feat/slack-notification]
   pull_request:
     branches: [main]
   schedule:
