@@ -20,7 +20,8 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "\\.(css|sass)$": "identity-obj-proxy"
+      "\\.(css|sass)$": "identity-obj-proxy",
+      "\\.svg$": "<rootDir>/__mocks__/svg-mock.js"
     },
     "transformIgnorePatterns": [
       "node_modules/(?!nanoevents|flat)"
